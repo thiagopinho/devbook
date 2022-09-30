@@ -57,11 +57,11 @@ func (user *Users) formatar(etapa string) error {
 	user.Email = strings.TrimSpace(user.Email)
 
 	if etapa == "cadastro" {
-		passwordWithHash, erro := security.Hash(user.Senha)
+		hashPassword, erro := security.Hash(user.Senha)
 		if erro != nil {
 			return erro
 		}
-		user.Senha = string(passwordWithHash)
+		user.Senha = string(hashPassword)
 	}
 	return nil
 }

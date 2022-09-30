@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/src/authentication"
 	"api/src/database"
 	"api/src/model"
 	"api/src/repository"
@@ -24,11 +25,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	var usuario model.Users
 	if erro = json.Unmarshal(requestBody, &usuario); erro != nil {
-		response.Erro(w, http.StatusInternalServerError, erro)
+		response.Erro(w, http.StatusBadRequest, erro)
 		return
 	}
 	db, erro := database.Conectar()
-	if erro = json.Unmarshal(requestBody, &usuario); erro != nil {
+	if erro != nil {
 		response.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
@@ -40,12 +41,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		response.Erro(w, http.StatusInternalServerError, erro)
 		return
 	}
-	fmt.Println(usuarioSalvoNoBanco)
 
 	if erro = security.VerifyPassword(usuarioSalvoNoBanco.Senha, usuario.Senha); erro != nil {
 		response.Erro(w, http.StatusUnauthorized, erro)
 		return
 	}
-
-	w.Write([]byte("Você está logado!"))
+	token, _ := authentication.CreateToken(usuarioSalvoNoBanco.ID)
+	fmt.Println(token)
+	w.Write([]byte(token))
 }
